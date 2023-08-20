@@ -10,6 +10,7 @@
 #include "ffshim.h"
 #include "fatfs/ff.h"
 #include "utils.h"
+#include "m2loader/ata.h"
 
 #include "stub.h"
 #define STUB_ADDR  0x80001000
@@ -348,7 +349,7 @@ int main()
     VIDEO_WaitVSync();
     CON_Init(__xfb, 0, 0, rmode->fbWidth, rmode->xfbHeight, rmode->fbWidth * VI_DISPLAY_PIX_SZ);
 
-    kprintf("\n\niplboot\n");
+    kprintf("\n\niplboot (with M.2 Loader support)\n");
 
     // Disable Qoob
     u32 val = 6 << 24;
@@ -390,6 +391,11 @@ int main()
     }
 
     paths[num_paths++] = default_path;
+
+	if (ide_exi_inserted(EXI_CHANNEL_2)) {
+        kprintf("M.2 Loader hardware detected\n");
+        if (load_fat("atac", &__io_atac, paths, num_paths)) goto load;
+    }
 
     if (load_usb('B')) goto load;
 
