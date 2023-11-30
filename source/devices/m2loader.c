@@ -653,3 +653,4 @@ const DISC_INTERFACE __io_m2ldr = {
     (FN_MEDIUM_WRITESECTORS)&__m2ldr_writeSectors,
     (FN_MEDIUM_CLEARSTATUS)&__m2ldr_clearStatus,
     (FN_MEDIUM_SHUTDOWN)&__m2ldr_shutdown};
+    
