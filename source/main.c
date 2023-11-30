@@ -397,7 +397,7 @@ int main()
 
     if (load_usb('A')) goto load;
 
-	if (M2Loader_IsInserted()) {
+    if (M2Loader_IsInserted()) {
         kprintf("M.2 Loader hardware detected\n");
         if (load_fat("m2ldr", &__io_m2ldr, paths, num_paths)) goto load;
     } else {
