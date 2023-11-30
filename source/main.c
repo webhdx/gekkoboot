@@ -260,9 +260,6 @@ int load_usb(char slot)
     kprintf("Waiting for ack (5s timeout)...\n");
     u64 current_time, start_time = gettime();
 
-    kprintf("Waiting for ack (5s timeout)...\n");
-    u64 current_time, start_time = gettime();
-
     while ((data != PC_READY) && (data != PC_OK))
     {
         current_time = gettime();
