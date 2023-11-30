@@ -1,26 +1,23 @@
 /**
- * IDE EXI Driver for Gamecube & Wii
- *
- * Based loosely on code written by Dampro
- * Re-written by emu_kidid
+ * M.2 Loader Driver for GameCube.
  * 
- * Very helpful ATA document: http://www.t10.org/t13/project/d1410r3a-ATA-ATAPI-6.pdf
+ * M.2 Loader is M.2 SATA SSD adapter for Serial Port 1.
+ * 
+ * Based on IDE-EXI Driver from Swiss
+ * Based loosely on code written by Dampro
+ * Re-written by emu_kidid, Extrems, webhdx
 **/
 
-#ifndef ATA_H
-#define ATA_H
+#ifndef M2LOADER_H
+#define M2LOADER_H
 
 #include <gccore.h>
 #include <ogc/disc_io.h>
 
-#define EXI_IDEEXIV2_ID 0x49444532
+#define EXI_M2LOADER_ID 			0x49444533 // IDE3
+#define DEVICE_TYPE_GC_M2LOADER		(('M'<<24)|('2'<<16)|('L'<<8)|'R')
 
-#define DEVICE_TYPE_GC_ATA	(('G'<<24)|('A'<<16)|('T'<<8)|'A')
-
-extern const DISC_INTERFACE __io_ataa;
-extern const DISC_INTERFACE __io_atab;
-extern const DISC_INTERFACE __io_atac;
-extern int _ideexi_version;
+extern const DISC_INTERFACE __io_m2ldr;
 
 // ATA status register bits
 #define ATA_SR_BSY		0x80
@@ -35,7 +32,7 @@ extern int _ideexi_version;
 // ATA error register bits
 #define ATA_ER_UNC		0x40
 #define ATA_ER_MC		0x20
-#define ATA_ER_IDNF		0x10
+#define ATA_ER_IDNF		0x10 
 #define ATA_ER_MCR		0x08
 #define ATA_ER_ABRT		0x04
 #define ATA_ER_TK0NF	0x02
@@ -63,19 +60,19 @@ extern int _ideexi_version;
 #define ATA_REG_STATUS			0x17	//1 0111b
                                        
 // ATA commands
-#define ATA_CMD_IDENTIFY	0xEC
-#define ATA_CMD_READSECT	0x21
-#define ATA_CMD_READSECTEXT	0x24
-#define ATA_CMD_WRITESECT	0x30
-#define ATA_CMD_WRITESECTEXT 0x34
-#define ATA_CMD_UNLOCK		0xF2
+#define ATA_CMD_IDENTIFY			0xEC
+#define ATA_CMD_READSECT			0x21
+#define ATA_CMD_READSECTEXT			0x24
+#define ATA_CMD_WRITESECT			0x30
+#define ATA_CMD_WRITESECTEXT 		0x34
+#define ATA_CMD_UNLOCK				0xF2
 #define ATA_CMD_SECURITY_DISABLE	0xF6
 
 // ATA Identity fields
 // all offsets refer to word offset (2 byte increments)
-#define ATA_IDENT_CYLINDERS	1			// number of logical cylinders
-#define ATA_IDENT_HEADS		3			// number of logical heads
-#define ATA_IDENT_SECTORS	6			// number of sectors per track
+#define ATA_IDENT_CYLINDERS		1		// number of logical cylinders
+#define ATA_IDENT_HEADS			3		// number of logical heads
+#define ATA_IDENT_SECTORS		6		// number of sectors per track
 #define ATA_IDENT_SERIAL		10		// Drive serial (20 characters)
 #define ATA_IDENT_MODEL			27		// Drive model name (40 characters)
 #define ATA_IDENT_LBASECTORS	60		// Number of sectors in LBA translation mode
@@ -104,17 +101,34 @@ typedef struct
 	u8 reserved[478];
 } unlockStruct;
 
-extern typeDriveInfo ataDriveInfo;
+extern typeDriveInfo M2LoaderDriveInfo;
 
-unsigned int exi_get_id(int chn, int dev);
+// Main SDK
+int M2Loader_DriveInit();
+int M2Loader_Unlock(int useMaster, char *password, int command);
+int M2Loader_ReadSectors(u64 sector, unsigned int numSectors, unsigned char *dest);
+int M2Loader_WriteSectors(u64 sector,unsigned int numSectors, unsigned char *src);
+int M2Loader_Shutdown();
+bool M2Loader_IsInserted();
+bool M2Loader_IsDriveInserted();
 
-// Prototypes
-int ataDriveInit(int chn);
-int ataUnlock(int chn, int useMaster, char *password, int command);
-int ataReadSectors(int chn, u64 sector, unsigned int numSectors, unsigned char *dest);
-int ataWriteSectors(int chn, u64 sector,unsigned int numSectors, unsigned char *src);
-bool ataIsInserted(int chn);
-int ataShutdown(int chn);
-int ide_exi_inserted(int chn);
+// Low level access functions
+u8 _M2Loader_ReadStatusReg();
+u8 _M2Loader_ReadErrorReg();
 
+void _M2Loader_WriteByte(u8 addr, u8 data);
+
+u16 _M2Loader_ReadU16();
+void _M2Loader_WriteU16(u16 data);
+
+void _M2Loader_ReadBuffer(u32 *dst);
+void _M2Loader_WriteBuffer(u32 *src);
+
+int _M2Loader_ReadSector(u64 lba, u32 *Buffer);
+int _M2Loader_WriteSector(u64 lba, u32 *Buffer);
+
+int _M2Loader_ReadSectors(u64 sector, unsigned int numSectors, unsigned char *dest);
+int _M2Loader_WriteSectors(u64 sector,unsigned int numSectors, unsigned char *src);
+
+void _M2Loader_PrintHddSector(u32 *dest);
 #endif

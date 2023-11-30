@@ -21,9 +21,9 @@ include $(DEVKITPRO)/libogc2/gamecube_rules
 #---------------------------------------------------------------------------------
 TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
-SOURCES		:=	source source/fatfs source/m2loader
+SOURCES		:=	source source/fatfs source/devices
 DATA		:=	data
-INCLUDES	:=  source/m2loader
+INCLUDES	:=  
 
 #---------------------------------------------------------------------------------
 # options for code generation

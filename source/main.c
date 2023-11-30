@@ -10,7 +10,7 @@
 #include "ffshim.h"
 #include "fatfs/ff.h"
 #include "utils.h"
-#include "m2loader/ata.h"
+#include "devices/m2loader.h"
 
 #include "stub.h"
 #define STUB_ADDR  0x80001000
@@ -260,6 +260,9 @@ int load_usb(char slot)
     kprintf("Waiting for ack (5s timeout)...\n");
     u64 current_time, start_time = gettime();
 
+    kprintf("Waiting for ack (5s timeout)...\n");
+    u64 current_time, start_time = gettime();
+
     while ((data != PC_READY) && (data != PC_OK))
     {
         current_time = gettime();
@@ -392,20 +395,23 @@ int main()
 
     paths[num_paths++] = default_path;
 
-	if (ide_exi_inserted(EXI_CHANNEL_2)) {
-        kprintf("M.2 Loader hardware detected\n");
-        if (load_fat("atac", &__io_atac, paths, num_paths)) goto load;
-    }
 
     if (load_usb('B')) goto load;
 
-    if (load_fat("sdb", &__io_gcsdb, paths, num_paths)) goto load;
-
     if (load_usb('A')) goto load;
 
-    if (load_fat("sda", &__io_gcsda, paths, num_paths)) goto load;
+	if (M2Loader_IsInserted()) {
+        kprintf("M.2 Loader hardware detected\n");
+        if (load_fat("m2ldr", &__io_m2ldr, paths, num_paths)) goto load;
+    } else {
+        kprintf("No M.2 Loader hardware detected\n");
+    }
 
     if (load_fat("sd2", &__io_gcsd2, paths, num_paths)) goto load;
+
+    if (load_fat("sdb", &__io_gcsdb, paths, num_paths)) goto load;
+
+    if (load_fat("sda", &__io_gcsda, paths, num_paths)) goto load;
 
 load:
     if (!dol)
