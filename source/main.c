@@ -1,7 +1,7 @@
+#include "devices/m2loader.h"
 #include "fatfs/ff.h"
 #include "ffshim.h"
 #include "utils.h"
-#include "devices/m2loader.h"
 #include "version.h"
 #include <fcntl.h>
 #include <malloc.h>
@@ -375,7 +375,7 @@ main() {
 		__xfb, 0, 0, rmode->fbWidth, rmode->xfbHeight, rmode->fbWidth * VI_DISPLAY_PIX_SZ
 	);
 
-    kprintf("\n\ngekkoboot %s (with M.2 Loader support)\n", version);
+	kprintf("\n\ngekkoboot %s (with M.2 Loader support)\n", version);
 
 	// Disable Qoob
 	u32 val = 6 << 24;
@@ -414,27 +414,34 @@ main() {
 
 	paths[num_paths++] = default_path;
 
-
-    if (load_usb('B')) goto load;
+	if (load_usb('B')) {
+		goto load;
+	}
 
 	if (load_usb('A')) {
 		goto load;
 	}
 
-    if (M2Loader_IsInserted()) {
-        kprintf("M.2 Loader hardware detected\n");
-        if (load_fat("m2ldr", &__io_m2ldr, paths, num_paths)) goto load;
-    } else {
-        kprintf("No M.2 Loader hardware detected\n");
-    }
+	if (M2Loader_IsInserted()) {
+		kprintf("M.2 Loader hardware detected\n");
+		if (load_fat("m2ldr", &__io_m2ldr, paths, num_paths)) {
+			goto load;
+		}
+	} else {
+		kprintf("No M.2 Loader hardware detected\n");
+	}
 
 	if (load_fat("sd2", &__io_gcsd2, paths, num_paths)) {
 		goto load;
 	}
 
-    if (load_fat("sdb", &__io_gcsdb, paths, num_paths)) goto load;
+	if (load_fat("sdb", &__io_gcsdb, paths, num_paths)) {
+		goto load;
+	}
 
-    if (load_fat("sda", &__io_gcsda, paths, num_paths)) goto load;
+	if (load_fat("sda", &__io_gcsda, paths, num_paths)) {
+		goto load;
+	}
 
 load:
 	if (!dol) {
