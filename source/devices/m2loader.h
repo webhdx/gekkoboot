@@ -14,7 +14,7 @@
 #include <gccore.h>
 #include <ogc/disc_io.h>
 
-#define EXI_M2LOADER_ID 0x49444533 // IDE3
+#define EXI_M2LOADER_ID 0x4944'4533 // IDE3
 #define DEVICE_TYPE_GC_M2LOADER (('M' << 24) | ('2' << 16) | ('L' << 8) | 'R')
 
 extern const DISC_INTERFACE __io_m2ldr;
@@ -82,53 +82,70 @@ extern const DISC_INTERFACE __io_m2ldr;
 
 // typedefs
 // drive info structure
-typedef struct
-{
-    u64 sizeInSectors;
-    u32 sizeInGigaBytes;
-    u32 cylinders;
-    u32 heads;   // per cylinder
-    u32 sectors; // per track
-    int lba48Support;
-    char model[48];
-    char serial[24];
+typedef struct {
+	u64 sizeInSectors;
+	u32 sizeInGigaBytes;
+	u32 cylinders;
+	u32 heads;   // per cylinder
+	u32 sectors; // per track
+	int lba48Support;
+	char model[48];
+	char serial[24];
 } typeDriveInfo;
 
-typedef struct
-{
-    u16 type; // 1 = master pw, 0 = user
-    char password[32];
-    u8 reserved[478];
+typedef struct {
+	u16 type; // 1 = master pw, 0 = user
+	char password[32];
+	u8 reserved[478];
 } unlockStruct;
 
 extern typeDriveInfo M2LoaderDriveInfo;
 
 // Main SDK
-int M2Loader_DriveInit();
-int M2Loader_Unlock(int useMaster, char *password, int command);
-int M2Loader_ReadSectors(u64 sector, unsigned int numSectors, unsigned char *dest);
-int M2Loader_WriteSectors(u64 sector, unsigned int numSectors, unsigned char *src);
-int M2Loader_Shutdown();
-bool M2Loader_IsInserted();
-bool M2Loader_IsDriveInserted();
+int
+M2Loader_DriveInit();
+int
+M2Loader_Unlock(int useMaster, char *password, int command);
+int
+M2Loader_ReadSectors(u64 sector, unsigned int numSectors, unsigned char *dest);
+int
+M2Loader_WriteSectors(u64 sector, unsigned int numSectors, unsigned char *src);
+int
+M2Loader_Shutdown();
+bool
+M2Loader_IsInserted();
+bool
+M2Loader_IsDriveInserted();
 
 // Low level access functions
-u8 _M2Loader_ReadStatusReg();
-u8 _M2Loader_ReadErrorReg();
+u8
+_M2Loader_ReadStatusReg();
+u8
+_M2Loader_ReadErrorReg();
 
-void _M2Loader_WriteByte(u8 addr, u8 data);
+void
+_M2Loader_WriteByte(u8 addr, u8 data);
 
-u16 _M2Loader_ReadU16();
-void _M2Loader_WriteU16(u16 data);
+u16
+_M2Loader_ReadU16();
+void
+_M2Loader_WriteU16(u16 data);
 
-void _M2Loader_ReadBuffer(u32 *dst);
-void _M2Loader_WriteBuffer(u32 *src);
+void
+_M2Loader_ReadBuffer(u32 *dst);
+void
+_M2Loader_WriteBuffer(u32 *src);
 
-int _M2Loader_ReadSector(u64 lba, u32 *Buffer);
-int _M2Loader_WriteSector(u64 lba, u32 *Buffer);
+int
+_M2Loader_ReadSector(u64 lba, u32 *Buffer);
+int
+_M2Loader_WriteSector(u64 lba, u32 *Buffer);
 
-int _M2Loader_ReadSectors(u64 sector, unsigned int numSectors, unsigned char *dest);
-int _M2Loader_WriteSectors(u64 sector, unsigned int numSectors, unsigned char *src);
+int
+_M2Loader_ReadSectors(u64 sector, unsigned int numSectors, unsigned char *dest);
+int
+_M2Loader_WriteSectors(u64 sector, unsigned int numSectors, unsigned char *src);
 
-void _M2Loader_PrintHddSector(u32 *dest);
+void
+_M2Loader_PrintHddSector(u32 *dest);
 #endif
