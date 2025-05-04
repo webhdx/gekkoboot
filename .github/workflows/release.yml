@@ -25,6 +25,9 @@ jobs:
       with:
         fetch-depth: 0 # Necessary for git describe in release.sh
 
+    - name: Mark repository as safe
+      run: git config --global --add safe.directory $GITHUB_WORKSPACE
+
     - name: Fetch Qoob prebuilt
       run: curl -Lo res/ipl.rom https://github.com/redolution/gekkoboot/releases/download/r5.2/iplboot.gcb
 
