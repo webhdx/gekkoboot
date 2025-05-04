@@ -103,6 +103,8 @@ foreach name, exe: dols
         output: name + '.dol',
         command: [elf2dol, '@INPUT@', '@OUTPUT@'],
         build_by_default: true,
+        install: true,
+        install_dir: '/',
     )
     set_variable(name + '_dol', dol)
 endforeach
