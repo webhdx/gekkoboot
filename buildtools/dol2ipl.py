@@ -129,7 +129,6 @@ def main():
 
     output = sys.argv[1]
     executable = sys.argv[2]
-    family = sys.argv[3]
 
     with open(executable, "rb") as f:
         exe = bytearray(f.read())
@@ -189,6 +188,12 @@ def main():
         out = header + scramble(bytearray(0x720) + img)[0x720:]
 
     elif output.endswith(".uf2"):
+        if len(sys.argv) < 4:
+            print("Missing family argument!")
+            return -1
+
+        family = sys.argv[3]
+
         if entry != 0x81300000 or load != 0x01300000:
             print("Invalid entry point and base address (must be 0x81300000)")
             return -1
