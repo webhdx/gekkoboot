@@ -186,7 +186,7 @@ pico_universal = custom_target(
     'pico_universal',
     input: [pico, pico2],
     output: 'gekkoboot_universal.uf2',
-    command: ['cat', '@INPUT0@', '@INPUT1@', '>', '@OUTPUT@'],
+    command: ['sh', '-c', 'cat @INPUT0@ @INPUT1@ > @OUTPUT@'],
     build_by_default: true,
     install: true,
     install_dir: '/',
