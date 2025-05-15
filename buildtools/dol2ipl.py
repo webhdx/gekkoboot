@@ -83,7 +83,16 @@ def flatten_dol(data):
     # Entry point, load address, memory image
     return entry, dol_min, img
 
-def pack_uf2(data, base_address):
+def pack_uf2(data, base_address, family):
+    if family == "rp2040":
+        family_id = 0xE48BFF56 # RP2040
+    elif family == "rp2350":
+        family_id = 0xE48BFF59 # RP2350-ARM-S
+    elif family == "data":
+        family_id = 0xE48BFF58 # DATA family ID compatible with RP2350
+    else:
+        raise ValueError(f"Unknown family: {family}")
+
     ret = bytearray()
 
     seq = 0
@@ -103,7 +112,7 @@ def pack_uf2(data, base_address):
             chunk_size,
             seq,
             total_chunks,
-            0xE48BFF56, # Board family: Raspberry Pi RP2040
+            family_id,
             chunk,
             0x0AB16F30, # Final magic
         )
@@ -115,11 +124,12 @@ def pack_uf2(data, base_address):
 
 def main():
     if len(sys.argv) not in range(3, 4 + 1):
-        print(f"Usage: {sys.argv[0]} <output> <executable> [<IPL ROM>]")
+        print(f"Usage: {sys.argv[0]} <output> <executable> [<IPL ROM>/<family>]")
         return 1
 
     output = sys.argv[1]
     executable = sys.argv[2]
+    family = sys.argv[3]
 
     with open(executable, "rb") as f:
         exe = bytearray(f.read())
@@ -199,7 +209,7 @@ def main():
         )
         assert len(header) == header_size
 
-        out = pack_uf2(header + img, 0x10080000)
+        out = pack_uf2(header + img, 0x10080000, family)
 
     elif output.endswith(".qbsx"):
         # SX BIOSes are always one page long
